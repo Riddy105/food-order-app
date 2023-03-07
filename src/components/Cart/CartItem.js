@@ -1,9 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { FoodCtx } from "../../App";
 
 const CartItem = (props) => {
-  const ctx = useContext(FoodCtx);
   const dispatch = useDispatch();
   const increamentItemHandler = () => {
     dispatch({ type: "INCREAMENT", id: props.id });

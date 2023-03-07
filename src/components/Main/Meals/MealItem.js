@@ -1,15 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { FoodCtx } from "../../../App";
+import React, { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 
 const MealItem = (props) => {
   const dispatch = useDispatch();
   const amount = useRef();
   const [inputIsValid, setInputIsValid] = useState(true);
-  // const [amount, setAmount] = useState(1);
-  // const changeHandler = (e) => {
-  //   setAmount(Number(e.target.value));
-  // };
+
   const clickHandler = () => {
     const foodQuantity = Number(amount.current.value);
     if (foodQuantity < 1 || foodQuantity > 5) {

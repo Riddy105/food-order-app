@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import CartItem from "./CartItem";
-import { FoodCtx } from "../../App";
 import { useSelector } from "react-redux";
 
 const Cart = (props) => {

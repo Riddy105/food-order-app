@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import icon from "../../assets/icon.svg";
 import Cart from "../Cart/Cart";
 import Overlay from "../Cart/Overlay";
-import { FoodCtx } from "../../App";
 import { useDispatch, useSelector } from "react-redux";
 
 const CartButton = (props) => {
