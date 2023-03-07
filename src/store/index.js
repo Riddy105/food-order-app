@@ -1,11 +1,5 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
-import { Provider } from "react-redux";
-import Header from "./components/Header/Header";
-import Main from "./components/Main/Main";
-import Form from "./components/Form";
-import store from "./store/index";
+import { createStore } from "redux";
 
-export const FoodCtx = React.createContext();
 const foodItems = [
   {
     name: "Sushi",
@@ -32,33 +26,41 @@ const foodItems = [
     id: "Green bowl",
   },
 ];
-const cartReducerFn = (state, action) => {
+const defaultCartState = {
+  cartItems: [],
+  totalAmount: 0,
+  itemInCart: 0,
+  foodItems,
+};
+const cartReducerFn = (state = defaultCartState, action) => {
   if (action.type == "INITIAL_ADD") {
+    const food = state.foodItems.find((food) => food.id == action.id); // Finding the exact food we want to add to cart in the foodItems array. This is also possible by searching for it in the component itself such that the only payload I add to the action will be the addedFood and I won't need to be doing any extra finding here in the ReducerFn.
+    const addedFood = { ...food, quantity: action.quantity };
+
     const existingItemIndex = state.cartItems.findIndex(
-      (food) => food.id == action.addedFood.id
+      (food) => food.id == addedFood.id
     );
     // findIndex returns -1 if unable to find any matching element so we leverage on this to either update an existing item or add it as a new item.
     // If items exists, we find it in the array of cartItems and then modify the quantity property inside just like we will do in JS.
     if (existingItemIndex != -1) {
-      const existingItem = state.cartItems[existingItemIndex];
-      state.cartItems[existingItemIndex] = {
+      const pseudoState = { ...state };
+      const existingItem = pseudoState.cartItems[existingItemIndex];
+      pseudoState.cartItems[existingItemIndex] = {
         ...existingItem,
-        quantity: action.addedFood.quantity + existingItem.quantity,
+        quantity: addedFood.quantity + existingItem.quantity,
       };
       return {
-        cartItems: state.cartItems,
-        totalAmount:
-          state.totalAmount +
-          action.addedFood.price * action.addedFood.quantity,
-        itemInCart: state.itemInCart + action.addedFood.quantity,
+        cartItems: pseudoState.cartItems,
+        totalAmount: state.totalAmount + addedFood.price * addedFood.quantity,
+        itemInCart: state.itemInCart + addedFood.quantity,
+        foodItems,
       };
     } else {
       return {
-        cartItems: [...state.cartItems, action.addedFood],
-        totalAmount:
-          state.totalAmount +
-          action.addedFood.price * action.addedFood.quantity,
-        itemInCart: state.itemInCart + action.addedFood.quantity,
+        cartItems: [...state.cartItems, addedFood],
+        totalAmount: state.totalAmount + addedFood.quantity * addedFood.price,
+        itemInCart: state.itemInCart + addedFood.quantity,
+        foodItems,
       };
     }
   }
@@ -75,6 +77,7 @@ const cartReducerFn = (state, action) => {
       cartItems: state.cartItems,
       totalAmount: state.totalAmount + itemToIncreament.price,
       itemInCart: state.itemInCart + 1,
+      foodItems,
     };
   }
   if (action.type == "DECREAMENT") {
@@ -94,41 +97,19 @@ const cartReducerFn = (state, action) => {
         cartItems: updatedItems,
         totalAmount: state.totalAmount - itemToDecreament.price,
         itemInCart: state.itemInCart - 1,
+        foodItems,
       };
     }
     return {
       cartItems: state.cartItems,
       totalAmount: state.totalAmount - itemToDecreament.price,
       itemInCart: state.itemInCart - 1,
+      foodItems,
     };
   }
+
+  return state;
 };
-function App() {
-  const [cartDetails, cartDispatchFn] = useReducer(cartReducerFn, {
-    cartItems: [],
-    totalAmount: 0,
-    itemInCart: 0,
-  });
-  const addToCart = (id, quantity) => {
-    const addedFood = foodItems.find((food) => food.id == id);
-    cartDispatchFn({
-      type: "INITIAL_ADD",
-      addedFood: { ...addedFood, quantity },
-    });
-  };
-  const increamentItem = (id) => {
-    cartDispatchFn({ type: "INCREAMENT", id });
-  };
-  const decreamentItem = (id) => {
-    cartDispatchFn({ type: "DECREAMENT", id });
-  };
 
-  return (
-    <Provider store={store}>
-      <Header></Header>
-      <Main></Main>
-    </Provider>
-  );
-}
-
-export default App;
+const store = createStore(cartReducerFn);
+export default store;
