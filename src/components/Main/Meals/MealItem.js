@@ -23,7 +23,7 @@ const MealItem = (props) => {
         <p className="italic">{props.motto}</p>
         <p className="font-bold text-lg text-brown-200">{`$${props.price}`}</p>
       </div>
-      <div className={!inputIsValid && invalidInputClasses}>
+      <div className={!inputIsValid ? invalidInputClasses : ""}>
         <div className="amount-wrapper flex gap-2 mb-2">
           <p>Amount</p>
           <input
